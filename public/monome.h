@@ -77,6 +77,7 @@ struct monome_event {
 			int x;
 			int y;
 			int z;
+			int k;
 		} tilt;
 	};
 };

@@ -100,9 +100,11 @@ static int proto_40h_led_set(monome_t *monome, uint_t x, uint_t y, uint_t on) {
 
 	ROTATE_COORDS(monome, x, y);
 
-	x &= 0x7;
-	y &= 0x7;
-
+	// Support for 65 light
+	if ((x == 8 && y != 7) || x > 8 || y > 7) {
+		return 0;
+	}
+	
 	buf[0] = PROTO_40h_LED_OFF + !!on;
 	buf[1] = (x << 4) | y;
 
@@ -184,28 +186,33 @@ static int proto_40h_next_event(monome_t *monome, monome_event_t *e) {
 		UNROTATE_COORDS(monome, e->grid.x, e->grid.y);
 		return 1;
 
+	}
+	
+	switch( buf[0] & 0xFC ) {
 	case PROTO_40h_AUX_1:
-	case PROTO_40h_AUX_1 + 1:
-	case PROTO_40h_AUX_1 + 2:
-	case PROTO_40h_AUX_1 + 3:
 		MONOME_40H_T(monome)->tilt.x = (((buf[0] & 0x3) << 8) | buf[1]) / 4;
-		goto tilt_common; /* shut up okay */
+		goto tilt_common;
 
 	case PROTO_40h_AUX_2:
-	case PROTO_40h_AUX_2 + 1:
-	case PROTO_40h_AUX_2 + 2:
-	case PROTO_40h_AUX_2 + 3:
 		MONOME_40H_T(monome)->tilt.y = (((buf[0] & 0x3) << 8) | buf[1]) / 4;
+		goto tilt_common;
 
-tilt_common: /* I SAID SHUT UP */
+	case PROTO_40h_AUX_3:
+		MONOME_40H_T(monome)->tilt.z = (((buf[0] & 0x3) << 8) | buf[1]) / 4;
+		goto tilt_common;
+
+	case PROTO_40h_AUX_4:
+		MONOME_40H_T(monome)->tilt.k = (((buf[0] & 0x3) << 8) | buf[1]) / 4;
+
+tilt_common: 
 		e->event_type = MONOME_TILT;
 		e->tilt.sensor = 0;
 		e->tilt.x = MONOME_40H_T(monome)->tilt.x;
 		e->tilt.y = MONOME_40H_T(monome)->tilt.y;
-		e->tilt.z = 0;
+		e->tilt.z = MONOME_40H_T(monome)->tilt.z;
+		e->tilt.k = MONOME_40H_T(monome)->tilt.k;
 		return 1;
 	}
-
 	return 0;
 }
 
@@ -252,6 +259,8 @@ monome_t *monome_protocol_new(void) {
 
 	MONOME_40H_T(monome)->tilt.x = 0;
 	MONOME_40H_T(monome)->tilt.y = 0;
+	MONOME_40H_T(monome)->tilt.z = 0;
+	MONOME_40H_T(monome)->tilt.k = 0;
 
 	return monome;
 }

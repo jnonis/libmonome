@@ -1,6 +1,7 @@
 # waf stuff
 .lock-waf*
 .waf*
+waf-*
 
 # build stuff
 build/
