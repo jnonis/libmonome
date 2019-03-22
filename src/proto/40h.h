@@ -26,6 +26,8 @@ typedef enum {
 	PROTO_40h_BUTTON_UP           = 0x00,
 	PROTO_40h_AUX_1               = 0x10,
 	PROTO_40h_AUX_2               = 0x14,
+	PROTO_40h_AUX_3               = 0x18,
+	PROTO_40h_AUX_4               = 0x1C,
 
 	/* output (to device) */
 
@@ -48,5 +50,7 @@ struct monome_40h {
 	struct {
 		int x;
 		int y;
+		int z;
+		int k;
 	} tilt;
 };

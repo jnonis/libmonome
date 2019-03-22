@@ -50,7 +50,8 @@ cdef extern from "monome.h":
 		uint sensor,
 		int x,
 		int y,
-		int z
+		int z,
+		int k
 
 	ctypedef struct monome_event_t:
 		monome_t *monome,
