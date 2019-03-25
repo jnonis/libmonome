@@ -257,19 +257,19 @@ static int proto_40h_next_event(monome_t *monome, monome_event_t *e) {
 
 	switch( buf[0] & 0xFC ) {
 	case PROTO_40h_AUX_1:
-		MONOME_40H_T(monome)->tilt.x = (((buf[0] & 0x3) << 8) | buf[1]) / 4;
+		MONOME_40H_T(monome)->tilt.x = (((buf[0] & 0x3) << 8) | buf[1]);
 		goto tilt_common;
 
 	case PROTO_40h_AUX_2:
-		MONOME_40H_T(monome)->tilt.y = (((buf[0] & 0x3) << 8) | buf[1]) / 4;
+		MONOME_40H_T(monome)->tilt.y = (((buf[0] & 0x3) << 8) | buf[1]);
 		goto tilt_common;
 
 	case PROTO_40h_AUX_3:
-		MONOME_40H_T(monome)->tilt.z = (((buf[0] & 0x3) << 8) | buf[1]) / 4;
+		MONOME_40H_T(monome)->tilt.z = (((buf[0] & 0x3) << 8) | buf[1]);
 		goto tilt_common;
 
 	case PROTO_40h_AUX_4:
-		MONOME_40H_T(monome)->tilt.k = (((buf[0] & 0x3) << 8) | buf[1]) / 4;
+		MONOME_40H_T(monome)->tilt.k = (((buf[0] & 0x3) << 8) | buf[1]);
 
 tilt_common:
 		e->event_type = MONOME_TILT;
