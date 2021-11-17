@@ -242,7 +242,7 @@ static int proto_40h_next_event(monome_t *monome, monome_event_t *e) {
 
 	read = monome_platform_read(monome, buf, sizeof(buf));
 	if (read < sizeof(buf))
-		return 0;
+		return read;
 
 	switch( buf[0] ) {
 	case PROTO_40h_BUTTON_DOWN:
