@@ -39,6 +39,8 @@ typedef enum {
 	PROTO_40h_SHUTDOWN            = 0x60,
 	PROTO_40h_LED_ROW             = 0x70,
 	PROTO_40h_LED_COL             = 0x80,
+	PROTO_40h_LED_LEVEL           = 0x90,
+	PROTO_40h_LED_ROW_LEVEL       = 0xA0,
 } proto_40h_message_t;
 
 

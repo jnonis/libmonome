@@ -151,7 +151,14 @@ static monome_led_functions_t proto_40h_led_functions = {
  */
 static int proto_40h_led_level_set(monome_t *monome, uint_t x, uint_t y,
                                       uint_t level) {
-	return proto_40h_led_set(monome, x, y, reduce_level_to_bit(level));
+	uint8_t buf[2];
+
+	ROTATE_COORDS(monome, x, y);
+
+	buf[0] = PROTO_40h_LED_LEVEL + (15 & level);
+	buf[1] = (x << 4) | y;
+
+	return monome_write(monome, buf, sizeof(buf));
 }
 
 static int proto_40h_led_level_all(monome_t *monome, uint_t level) {
@@ -160,20 +167,32 @@ static int proto_40h_led_level_all(monome_t *monome, uint_t level) {
 
 static int proto_40h_led_level_map(monome_t *monome, uint_t x_off,
 		uint_t y_off, const uint8_t *data) {
-	uint8_t levels[64];
-	uint8_t masks[8];
-	uint_t i;
 
-	/* don't rotate coords here like you would in mext, since rotate happens
-	 * in the call to the normal led_map function
-	 */
+	uint8_t levels[64];
+	uint8_t buf[5];
+	uint_t i, j, y;
+	int ret = 0;
+
 	ROTSPEC(monome).level_map_cb(monome, levels, data);
 
-	/* reduce the level data into a bitmask */
 	for (i = 0; i < 8; ++i) {
-		masks[i] = reduce_levels_to_bitmask(&levels[i * 8]);
-	};
-	return proto_40h_led_map(monome, x_off, y_off, masks);
+		uint_t address = i;
+		uint_t xaddress = address;
+
+		ROTATE_COORDS(monome, xaddress, address);
+
+		buf[0] = PROTO_40h_LED_ROW_LEVEL | (address & 15);
+		y = 0;
+		for(j = 0; j < 4; j++) {
+			uint8_t level1 = levels[(y * 8) + i];
+			y++;
+			uint8_t level2 = levels[(y * 8) + i];
+			y++;
+			buf[j + 1] = (level1 << 4) | (level2 & 15);
+		}
+		ret += monome_write(monome, buf, sizeof(buf));
+	}
+	return ret;
 }
 
 
